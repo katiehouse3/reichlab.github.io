@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Nicholas Reich: Biostatistics and Infectious Disease Epidemiology</title>
+    <description>Reich Lab @ UMassAmherst</description>
+    <link>http://reichlab.io//</link>
+    <atom:link href="http://reichlab.io//feed.xml" rel="self" type="application/rss+xml" />
+    
+      <item>
+        <title>Building a collaborative ensemble to forecast influenza</title>
+        <description>&lt;p&gt;In March 2017, a group of influenza forecasters who have participated in the &lt;a href=&quot;https://predict.phiresearchlab.org&quot;&gt;CDC FluSight challenge&lt;/a&gt; in past seasons established the FluSight Network, a multi-institution and multi-disciplinary consortium of forecasting teams. This group worked throughout 2017 to create a public, real-time collaborative ensemble forecasting model that provides &lt;a href=&quot;http://flusightnetwork.io/&quot;&gt;updated forecasts of influenza in the US each week&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://flusightnetwork.io&quot;&gt;&lt;img class=&quot;img-responsive&quot; width=&quot;700&quot; src=&quot;/images/blog/collaborative-ensemble-overview.png&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h3 id=&quot;background&quot;&gt;Background&lt;/h3&gt;
+&lt;p&gt;Every flu season since 2013/2014, the CDC has organized a challenge where, each week from early November through mid April, teams submit forecasts about the flu season in the US.
+For every week in a season, each submission contains forecasts for seven targets of public health interest specified by the CDC for each of the 11 HHS regions. The region-level targets are: the fraction of doctor’s visits where due to influenza-like-illness in each of the next four weeks of the season, the week of season onset, the week in which the peak wILI occurs, and the level of the peak wILI.
+The forecasts themselves are text files containing, in a specified format, data that encode predictive distribution for these targets.&lt;/p&gt;
+
+&lt;p&gt;Throughout this project, the central question has been &lt;strong&gt;can we provide better information to decision makers by combining forecasting models&lt;/strong&gt;, and specifically by using past performance of the component models to inform the ensemble approach. All previous participants in FluSight challenges were invited to join the FluSight Network. Four groups decided to participate and contributed &lt;a href=&quot;https://github.com/FluSightNetwork/cdc-flusight-ensemble/tree/master/model-forecasts&quot;&gt;21 models in total&lt;/a&gt; using a diverse array of methodologies, including kernel conditional density estimation, Bayesian state-space models, simple seasonal models, auto-regressive models for time-series, and susceptible-infectious-recovered-susceptible compartmental models, to name just a few.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Institution&lt;/th&gt;
+      &lt;th&gt;No. of models&lt;/th&gt;
+      &lt;th&gt;Team leaders&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Delphi team at Carnegie Mellon&lt;/td&gt;
+      &lt;td&gt;9&lt;/td&gt;
+      &lt;td&gt;Logan Brooks, Roni Rosenfeld&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Columbia University&lt;/td&gt;
+      &lt;td&gt;7&lt;/td&gt;
+      &lt;td&gt;Teresa Yamana, Sasikiran Kandula, Jeff Shaman&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Los Alamos National Laboratory&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;Dave Osthus&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Reich Lab at UMass-Amherst&lt;/td&gt;
+      &lt;td&gt;4&lt;/td&gt;
+      &lt;td&gt;Nicholas Reich, Abhinav Tushar, Evan Ray&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Prior to the start of the 2017/2018 influenza season in the US (first submissions were due on November 6), we assembled these 21 distinct forecasting models for influenza, each with forecasts from the last seven influenza seasons in the US. (To the extent possible, these forecasts were only allowed to use data available at the time the forecasts were made.)&lt;/p&gt;
+
+&lt;p&gt;Subsequently, we conducted a cross-validation study to compare five different methods for combining these models into a single ensemble forecast. Specifically, this was done by leaving one season out at a time, fitting each ensemble model based on the remaining seasons’ data, and generating ensemble forecasts for each week of the left-out season. Then, we evaluated and compared the performance of the ensemble models.&lt;/p&gt;
+
+&lt;h3 id=&quot;ensemble-specifications&quot;&gt;Ensemble specifications&lt;/h3&gt;
+&lt;p&gt;All of our ensemble models are built by taking weighted averages of the component models. We examined the performance of five different possible ensemble specifications (see table below). The “equal weights” model takes a simple average of all of the models, with no consideration of past performance. The other four approaches estimated weights for models based on past performance, using the degenerate EM algorithm.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Model&lt;/th&gt;
+      &lt;th&gt;No. of weights&lt;/th&gt;
+      &lt;th&gt;description&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Equal weights (EW)&lt;/td&gt;
+      &lt;td&gt;1&lt;/td&gt;
+      &lt;td&gt;Every model gets same weight.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Constant weights (CW)&lt;/td&gt;
+      &lt;td&gt;21&lt;/td&gt;
+      &lt;td&gt;Every model gets a single weight, not necessarily the same.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Target-type-based weights (TTW)&lt;/td&gt;
+      &lt;td&gt;42&lt;/td&gt;
+      &lt;td&gt;Two sets of weights, one for seasonal targets and one for weekly wILI targets.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Target-based weights (TW)&lt;/td&gt;
+      &lt;td&gt;147&lt;/td&gt;
+      &lt;td&gt;Seven sets of weights, one for each target separately.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Target-and-region-based weights (TRW)&lt;/td&gt;
+      &lt;td&gt;1,617&lt;/td&gt;
+      &lt;td&gt;Target-based weights estimated separately for each region.&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&quot;forecast-evaluation&quot;&gt;Forecast Evaluation&lt;/h3&gt;
+&lt;p&gt;We measured performance by computing the average score across all targets and all relevant weeks in the last seven seasons. (Including only “relevant weeks” means, e.g., that for evaluating season onset we exclude weeks after the onset has clearly occured, because at this point, the forecasts are no longer informative.) The ensemble models generally showed better average scores than any of the component models, and there was little difference between the CW, TTW, TW, and TRW models.&lt;/p&gt;
+
+&lt;p&gt;For submitting in real-time in 2017-2018, we selected the ensemble model that achieved the best overall score in the cross-validation experiment over the last seven seasons. This was the target-type-based model (TTW) that assigned one set of weights to each component model for the weekly incidence targets and another set of weights for the seasonal targets (onset timing, peak timing, and peak incidence).&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;img-responsive&quot; width=&quot;700&quot; src=&quot;/images/blog/collaborative-ensemble-comparison.jpeg&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 28 Nov 2017 00:00:00 +0000</pubDate>
+        <link>http://reichlab.io//2017/11/28/flusight-ensemble.html</link>
+        <guid isPermaLink="true">http://reichlab.io//2017/11/28/flusight-ensemble.html</guid>
+      </item>
+    
+      <item>
+        <title>Slides for Ensemble Talk at MIDAS</title>
+        <description>&lt;p&gt;Here are the slides for my presentation today at the annual MIDAS conference in Atlanta, GA. The talk summarizes recent work led by post-doc Evan Ray on creating interpretable “feature-weighted density ensembles” for infectious disease forecasting. The paper is currently under review, but &lt;a href=&quot;https://arxiv.org/abs/1703.10936&quot;&gt;the preprint is available on arXiv&lt;/a&gt;. Check out the 2017-2018 real-time influenza forecasts from this model available on our &lt;a href=&quot;http://reichlab.io/flusight/&quot;&gt;flusight app&lt;/a&gt;. And here are some slices of the feature-dependent weighting functions for predicting peak incidence for influenza in the U.S.&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;img-responsive&quot; width=&quot;700&quot; src=&quot;/images/blog/ensemble-model-weights.png&quot; /&gt;&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;Here is the full slide deck for the talk:
+&lt;script async=&quot;&quot; class=&quot;speakerdeck-embed&quot; data-id=&quot;5c7b7fc721c44d4db80dae250db0a704&quot; data-ratio=&quot;1.33333333333333&quot; src=&quot;//speakerdeck.com/assets/embed.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;
+</description>
+        <pubDate>Wed, 24 May 2017 00:00:00 +0000</pubDate>
+        <link>http://reichlab.io//2017/05/24/MIDAS-slides.html</link>
+        <guid isPermaLink="true">http://reichlab.io//2017/05/24/MIDAS-slides.html</guid>
+      </item>
+    
+      <item>
+        <title>Machine Learning and Clinical Decision Making</title>
+        <description>&lt;p&gt;I wrote a response to &lt;a href=&quot;http://www.newyorker.com/magazine/2017/04/03/ai-versus-md&quot;&gt;Siddhartha Mukherjee’s article “A.I. vs. M.D.”&lt;/a&gt; that appeared in the &lt;em&gt;New Yorker&lt;/em&gt; last month. While I submitted it as a letter to the editor, they didn’t publish it. In retrospect, perhaps it was a bit long-winded for their curt and pithy letters section. Mukherjee’s article was published on the heels of Evan submitting &lt;a href=&quot;https://arxiv.org/abs/1703.10936&quot;&gt;his latest work on improving the consistency of infectious disease prediction using interpretable model averaging methods&lt;/a&gt;. What follows is the letter I submitted.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Siddhartha Mukherjee nicely characterizes both sides in a looming paradigm shift in clinical practice: how to incorporate the promises of “big data” into decision-making and diagnoses that impact real people (“A.I. vs. M.D.”, April 3rd). In doing so, he exposes a rift not just between machine learners (who cling to their data and models) and clinicians (who often trust in anecdote and experience), but a rift in the machine learning community itself.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Many “deep learning” algorithms are, as Mukherjee describes, black boxes whose promise to “replace dermatologists and radiologists”  would understandably rankle even very forward-thinking diagnosticians. When life-and-death decisions are being made, it is a lot to ask anyone to trust the black box.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;However, not all predictive models are or need to be opaque to the experts they are designed to aid. Many predictive models (for example, certain “model averaging” approaches) can provide more information to clinicians and patients about how they work, and why they succeed and fail.  Development and investigation of transparent approaches can and should be emphasized over other more opaque approaches that thwart interpretability.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;While data-driven approaches deserve to make their way into clinical and public-health decision-making, the benefits for patients will only be maximized if clinicians, biostatisticians, and computer scientists partner closely. To succeed, future efforts must focus on enhancing existing intuitive, interpretable predictive models and finding ways to peel back the layers of complexity of others. With transparency will come trust, and improved clinical care.&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+        <pubDate>Sun, 14 May 2017 00:00:00 +0000</pubDate>
+        <link>http://reichlab.io//2017/05/14/ai-vs-md.html</link>
+        <guid isPermaLink="true">http://reichlab.io//2017/05/14/ai-vs-md.html</guid>
+      </item>
+    
+      <item>
+        <title>U.S. Influenza Forecast updates (Nov 29 edition)</title>
+        <description>&lt;p&gt;We updated our &lt;a href=&quot;https://reichlab.github.io/flusight/&quot;&gt;U.S. influenza forecasts&lt;/a&gt; on Tuesday, November 29th. (We tend to update the forecasts on Mondays, but the CDC data release was delayed this week due to Thanksgiving last week.) Overall, the data and the short-term forecasts for flu are showing regional circulation of flu that is a bit below the CDC-defined baseline levels. The two exceptions are in HHS Region 2 (NY and NJ) which is right at its baseline level, according to the most recent data from the CDC (reported through November 19th), and HHS Region 4 (the southeastern corner of the US) which already has risen above its baseline. Region 4 has historically had somewhat earlier seasons than the rest of the US. Check out our interactive &lt;a href=&quot;https://reichlab.github.io/flusight/&quot;&gt;FluSight app&lt;/a&gt; for more details on each region.&lt;/p&gt;
+
+&lt;p&gt;Reported U.S. regional influenza incidence in Nov 13-19 (MMWR week 46), 2016. Colors show percent above or below baseline:
+&lt;a href=&quot;https://reichlab.github.io/flusight/&quot;&gt;
+    &lt;img class=&quot;img-responsive&quot; width=&quot;700&quot; src=&quot;/images/blog/20161130-us-flu-map.png&quot; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;Last week, I gave a quick &lt;a href=&quot;https://reichlab.github.io/2016/11/23/introducing-flusight.html&quot;&gt;under-the-hood look at how we make our forecasts&lt;/a&gt;. This week, I’m going to interpret more directly our forecasts for this week.&lt;/p&gt;
+
+&lt;p&gt;Our model is currently combiing predictions from three component models to deliver a single forecast. Depending on the region, it is combining the predictions with different weights. One thing that we’ve noticed is that the seasonal auto-regressive integrated moving average (SARIMA) model is a bit more “jumpy”, or willing to predict a rapid increase than the other models. This year, it has shown mixed performance. For example, last week it predicted upticks in Regions 2 and 4 that were almost exactly right. However, it also predicted upticks in Regions 3 and 6 that were wrong.&lt;/p&gt;
+
+&lt;p&gt;These are early assessments of prediction accuracy, and they may change, as the CDC often does update its data over the course of a few subsequent weeks. See for example this example of data reported in week 52 of 2015 (dark line with dots in the figure below) that was subsequently adjusted down (solid green line):
+&lt;a href=&quot;https://reichlab.github.io/flusight/&quot;&gt;
+    &lt;img class=&quot;img-responsive&quot; width=&quot;700&quot; src=&quot;/images/blog/20161130-backfill-issue.png&quot; /&gt;
+&lt;/a&gt;
+This “backfill” issue (adjustment of reported data in weeks following the initial report) is not something that we have yet accounted for in our forecasts, although it is on the short-list of issues to add to our development model that will be udpated throughout the season.&lt;/p&gt;
+
+&lt;p&gt;In most regions, our ensemble model is sticking closely to the &lt;a href=&quot;https://github.com/reichlab/article-disease-pred-with-kcde/raw/master/inst/article/infectious-disease-prediction-with-kcde.pdf&quot;&gt;KCDE model&lt;/a&gt; for its weekly forecasts. The figure below, showing our current forecasts for Region 4, highlights how the red predictions (ensemble model) overlay the blue predictions (KCDE) almost exactly. For now, the ensemble is resisting the urge to follow the urgency of the green SARIMA model or the conservatism of the orange model which is pulling the trajectory back towards a seasonal average:
+&lt;a href=&quot;https://reichlab.github.io/flusight/&quot;&gt;
+    &lt;img class=&quot;img-responsive&quot; width=&quot;700&quot; src=&quot;/images/blog/20161130-region4-forecast.png&quot; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Stay tuned for periodic updates throughout the season!&lt;/p&gt;
+</description>
+        <pubDate>Wed, 30 Nov 2016 00:00:00 +0000</pubDate>
+        <link>http://reichlab.io//2016/11/30/flu-forecasts.html</link>
+        <guid isPermaLink="true">http://reichlab.io//2016/11/30/flu-forecasts.html</guid>
+      </item>
+    
+      <item>
+        <title>Under the hood of our real-time flu predictions</title>
+        <description>&lt;p&gt;For the second year in a row, the Reich Lab is participating in the &lt;a href=&quot;https://predict.phiresearchlab.org/post/57f3f440123b0f563ece2576&quot;&gt;CDC FluSight challenge&lt;/a&gt;, a project where teams from around the country submit real-time predictions of influenza to the CDC. The teams use a variety of different models and methods to generate these predictions, from &lt;a href=&quot;http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004382&quot;&gt;an empirical Bayes method that uses Google search data&lt;/a&gt; to &lt;a href=&quot;http://www.nature.com/articles/ncomms3837&quot;&gt;a extended Kalman-filter method that uses humidity data&lt;/a&gt; to &lt;a href=&quot;https://github.com/reichlab/article-disease-pred-with-kcde/raw/master/inst/article/infectious-disease-prediction-with-kcde.pdf&quot;&gt;our kernel conditional density estimation method using recent incidence&lt;/a&gt;, and there are many others!&lt;/p&gt;
+
+&lt;p&gt;This year, we – well, mostly &lt;a href=&quot;https://github.com/elray1&quot;&gt;Evan&lt;/a&gt; – have developed a new ensemble method that combines predictions from different models. We – mostly &lt;a href=&quot;https://github.com/lepisma&quot;&gt;Abhinav&lt;/a&gt; – also created a visualizer for our predictions. Check it out &lt;a href=&quot;https://reichlab.github.io/flusight/&quot;&gt;here&lt;/a&gt;! It’s still early in the season, and we’re not seeing much data to suggest that this will be an unusually high or low year, but that’s largely because there just isn’t much information in the early-season data.
+In this post, I’m going to give you a quick tour under the hood of our ensemble forecasting methodology. At some point, we’ll have an article up on GitHub or arXiv, but for now, this explanation will have to suffice.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://reichlab.github.io/flusight/&quot;&gt;
+    &lt;img class=&quot;img-responsive&quot; width=&quot;700&quot; src=&quot;/images/blog/flusight-wide.png&quot; /&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2 id=&quot;details-of-the-challenge&quot;&gt;Details of the challenge&lt;/h2&gt;
+&lt;p&gt;We call our team the Kernel of Truth (left over from our KCDE methods last year, although we hope the name still is appropriate). The contest is based on predicting a measure of influenza incidence that represents the percentage of all doctor’s visits that are for influenza-like-illness (ILI), weighted by population. The measure is called “weighted ILI” and its units are percentage points. Per contest rules, all submissions have to submit full predictive distributions each week from November through April for seven different targets of interest, for each of the HHS regions in the U.S. (and for the country as a whole). Here are the targets&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;incidence for each of the next four weeks&lt;/li&gt;
+  &lt;li&gt;onset week: the first week of the first sequence of three weeks to be above the regional CDC baseline for weighted ILI&lt;/li&gt;
+  &lt;li&gt;peak week: the week in which peak incidence will occur&lt;/li&gt;
+  &lt;li&gt;peak incidence: the actual value of weighted ILI at the peak week&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;component-models&quot;&gt;Component models&lt;/h2&gt;
+&lt;p&gt;For our submissions this year, we obtain the final predictive distributions as a weighted average of predictions from three component models:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;A “fixed” model using either Kernel Density Estimation (for onset week, peak week, and peak incidence), or a generalized additive model (for predictions of incidence at horizons 1 to 4 weeks).  The raw predictions from this model do not change as new data are observed over the course of the season (though the predictions for incidence in individual weeks do depend on the week being predicted), and can be interpreted as a representation of “everything that we have seen in the past”.  A separate model fit is obtained for each region. In week 3 of the competition (Nov 21, 2016), we modified this method to truncate the predictive distributions for onset timing, peak timing, and peak incidence so that values that have been eliminated by previously observed incidence are assigned low probability. Currently, this is done in a very ad hoc manner.&lt;/li&gt;
+  &lt;li&gt;A model combining Kernel Conditional Density Estimation (KCDE) and copulas. this method is described in more detail &lt;a href=&quot;https://github.com/reichlab/article-disease-pred-with-kcde/raw/master/inst/article/infectious-disease-prediction-with-kcde.pdf&quot;&gt;here&lt;/a&gt;. In brief, KCDE is used to obtain separate predictive densities for each future week in the season.  In order to predict seasonal quantities (onset, peak timing, and peak incidence), we use a copula to model dependence among those individual predicitive densities, thereby obtaining a joint predicitive density for incidence in all future weeks.  Predicitive densities for the seasonal quantities can be obtained as appropriate integrals of this joint density.  A separate model fit is obtained for each region.&lt;/li&gt;
+  &lt;li&gt;A seasonal auto-regressive integrated moving average (SARIMA) model. This model is fit to seasonally differenced log(weighted_ili) using a stepwise procedure to select the model specification. A separate model fit is obtained for each region.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;ensemble-model&quot;&gt;Ensemble model&lt;/h2&gt;
+&lt;p&gt;The final predictions are obtained as a linear combination of the predictions from these component models using a method known as “stacking” or model averaging.  The model weights depend on the week of the season in which the predictions are made. There is a lot of gnarly math and computation that we’re leaving out here, but if you’d like to see it let us know in the comments section and post some more details.  We estimate the weights via gradient tree boosting, optimizing leave-one-season-out crossvalidated log scores (using the definition of log scores specified for this competition). Currently we are using the &lt;code class=&quot;highlighter-rouge&quot;&gt;xgboost&lt;/code&gt; package in R to implement this, although there have been some rumblings about moving to another method, as this one is giving us some problems when the curvature of our loss function is negative. I’ll spare you the details for now.&lt;/p&gt;
+
+&lt;p&gt;We are submitting two variations on the ensemble model:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;KoTstable is a stable version, in which we will hold fixed all details and model fits for the component models as well as the model weights throughout the season.  Because this model will not be updated, we will be able to learn about model performance over the course of the season. These are the predictions currently shown on the &lt;a href=&quot;https://reichlab.github.io/flusight/&quot;&gt;FluSight visualizer&lt;/a&gt;.&lt;/li&gt;
+  &lt;li&gt;KoTdev is a development version, which we will update over the course of the season.  We have plans for tweaks to all three of the existing component models, the addition of new component models, and changes to computation of the model weights.  This model provides a sandbox for development of new features and continuous improvement of our prediction methodology.  In the first submission week, the predictions from KoTstable and KoTdev were&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
+&lt;p&gt;There is a lot more work to do on this to get it to where we want to it be, but one of the “advantages” of these challenges is that they force you to get stuff out there and just try it out. Some of the things that we are thinking about doing are improving the estimation methodology for the weights (including perhaps some kind of smoothing or regularization of the weights), adding a more mechanistic model that incorporates some biological features of flu, and incorporating the uncertainty in recent observations (as you can see in the app, there can be adjustments to reported cases, especially in the most recently reported weeks). So, there’s lots to do, and we’re hopefully just getting started.&lt;/p&gt;
+</description>
+        <pubDate>Wed, 23 Nov 2016 00:00:00 +0000</pubDate>
+        <link>http://reichlab.io//2016/11/23/introducing-flusight.html</link>
+        <guid isPermaLink="true">http://reichlab.io//2016/11/23/introducing-flusight.html</guid>
+      </item>
+    
+      <item>
+        <title>Using the DELPHI API to access infectious disease data</title>
+        <description>&lt;p&gt;This week I attended a workshop at the CDC about last year’s &lt;a href=&quot;https://predict.phiresearchlab.org/flu/index.html&quot;&gt;FluSight challenge&lt;/a&gt;, a competition that scores weekly real-time predictions about the course of the influenza season. They are planning another round this year and are hoping to increase the number of teams particiating. Stay tuned to &lt;a href=&quot;https://predict.phiresearchlab.org/flu/index.html&quot;&gt;this site&lt;/a&gt; for more info.&lt;/p&gt;
+
+&lt;p&gt;At the workshop, I learned about &lt;a href=&quot;http://delphi.midas.cs.cmu.edu/&quot;&gt;DELPHI’s&lt;/a&gt; real-time epidemiological &lt;a href=&quot;https://github.com/undefx/delphi-epidata&quot;&gt;data API&lt;/a&gt;. The API is linked to various data sources on influenza and dengue, including US CDC flu data, Google Flu Trends, and Wikipedia data. There is &lt;a href=&quot;https://github.com/undefx/delphi-epidata#the-api&quot;&gt;some documentation&lt;/a&gt; and &lt;a href=&quot;https://github.com/undefx/delphi-epidata#code-samples&quot;&gt;minimal examples&lt;/a&gt;, and this post documents a more robust and complete example for using the API via R. I’ll note that the CDC’s influenza data, can also be accessed via the &lt;code class=&quot;highlighter-rouge&quot;&gt;cdcfluview&lt;/code&gt; R package, which I’m not going to discuss here and I will focus here on accessing some of the other data sources. Here’s a teaser of this data that you can also interactively explore on the &lt;a href=&quot;http://delphi.midas.cs.cmu.edu/epivis/epivis.html&quot;&gt;DELPHI EpiVis website&lt;/a&gt;:
+&lt;img class=&quot;img-responsive&quot; width=&quot;600&quot; src=&quot;/images/blog/epivis.png&quot; /&gt;&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h2 id=&quot;setup&quot;&gt;Setup&lt;/h2&gt;
+
+&lt;p&gt;Let’s start by loading the R script containing the relevant methods needed to access the API.&lt;/p&gt;
+
+&lt;div class=&quot;language-r highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;https://raw.githubusercontent.com/undefx/delphi-epidata/master/code/delphi_epidata.R&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Then, load in two packages that we will use to tidy and plot the data.&lt;/p&gt;
+
+&lt;div class=&quot;language-r highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;library&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MMWRweek&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;library&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ggplot2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;dengue-data-from-taiwan-cdc&quot;&gt;Dengue data from Taiwan CDC&lt;/h2&gt;
+
+&lt;p&gt;Here is some code that pulls data from &lt;a href=&quot;http://nidss.cdc.gov.tw/en/&quot;&gt;Taiwan’s NIDSS&lt;/a&gt;, specifically asking for nationwide data, and data from the central region. A complete list of &lt;a href=&quot;https://github.com/undefx/delphi-epidata/blob/master/labels/nidss_regions.txt&quot;&gt;regions&lt;/a&gt; and &lt;a href=&quot;https://github.com/undefx/delphi-epidata/blob/master/labels/nidss_locations.txt&quot;&gt;locations&lt;/a&gt; are available. Also, I’ve specified a range of weeks from the first week of 2010 (&lt;code class=&quot;highlighter-rouge&quot;&gt;201001&lt;/code&gt;) to the last week of 2016 (&lt;code class=&quot;highlighter-rouge&quot;&gt;201653&lt;/code&gt;).&lt;/p&gt;
+
+&lt;div class=&quot;language-r highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Epidata&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nidss.dengue&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;locations&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'nationwide'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'central'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; 
+                            &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epiweeks&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Epidata&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;201001&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;201653&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The above command should pull data down into your current session, but it will be a little bit ‘list-y’, so here is some code I wrote to clean it up and make it a bit more of a workable dataset in R.&lt;/p&gt;
+
+&lt;div class=&quot;language-r highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data.frame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;matrix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unlist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epidata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nrow&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epidata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;byrow&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;colnames&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;names&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epidata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]])[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;is.null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epidata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]])]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;as.numeric&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;as.character&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;year&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;as.numeric&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;substr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epiweek&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;week&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;as.numeric&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;substr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epiweek&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MMWRweek2Date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MMWRyear&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;year&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MMWRweek&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;week&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note the use of the &lt;code class=&quot;highlighter-rouge&quot;&gt;MMWRweek2Date()&lt;/code&gt; function that gives us a date column in our data frame. And here is a plot of the resulting data.&lt;/p&gt;
+
+&lt;div class=&quot;language-r highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;ggplot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;aes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;geom_point&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scale_y_log10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/blog/nidss-data.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;wikipedia-data&quot;&gt;Wikipedia data&lt;/h2&gt;
+
+&lt;p&gt;Let’s try loading some of the Wikipedia data on influenza and other related terms. The article. I think this reflects the number of hits on pages of certain articles, although I’m not sure.&lt;/p&gt;
+
+&lt;div class=&quot;language-r highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Epidata&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wiki&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;articles&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;influenza&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;common_cold&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;cough&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+                    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epiweeks&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Epidata&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;201101&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;201553&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data.frame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;matrix&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unlist&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epidata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nrow&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epidata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;byrow&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;colnames&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;names&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epidata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]])[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;is.null&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;res&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epidata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]])]&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;as.numeric&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;as.character&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;year&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;as.numeric&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;substr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epiweek&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;week&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;as.numeric&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;substr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;epiweek&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MMWRweek2Date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MMWRyear&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;year&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;MMWRweek&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;week&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ggplot&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;df&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;aes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;x&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;y&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;article&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; 
+  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;geom_point&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; 
+  &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;geom_smooth&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;span&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;se&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/blog/wiki-data.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Happy data exploring!&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;UPDATE&lt;/strong&gt;: (2 Sept 2016) Roni Rosenfeld, the head of the DELPHI group at CMU, pointed out and asked me to mention that David Farrow was the force behind the creation of the epidata API and the epivis tool.&lt;/p&gt;
+</description>
+        <pubDate>Thu, 01 Sep 2016 00:00:00 +0000</pubDate>
+        <link>http://reichlab.io//2016/09/01/epidata-api.html</link>
+        <guid isPermaLink="true">http://reichlab.io//2016/09/01/epidata-api.html</guid>
+      </item>
+    
+      <item>
+        <title>Five College DataFest recap: tips for next year</title>
+        <description>&lt;p&gt;Another Five College ASA DataFest has long come and gone, and I’ve been meaning to write a recap for a while. Now in its third year in the Pioneer Valley in Western Massachusetts, the number of registrants doubled from last year, from 70 to 140. All Five Colleges (Amherst, Hampshire, Mt. Holyoke, Smith, and UMass-Amherst) sent multiple teams, and there were a few teams with a mix of students from different schools.&lt;/p&gt;
+
+&lt;p&gt;Team “Beta than U” from UMass-Amherst took home one of the Best in Group awards. From left to right: Laura Bowles, Vincent Lee, Harley Jean, Bianca Agustin, and Stephanie Crowley.
+&lt;img class=&quot;img-responsive&quot; width=&quot;450&quot; src=&quot;/images/blog/beta-than-u.jpg&quot; /&gt;&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;From UMass participants alone, the academic departmental diversity was striking: I recorded 17 distinct majors represented from the registration list. They were Computer Science, Public Health, Finance, Applied Math, Economics, Mathematics, Statistics, Biology, Kinesiology, Biochemistry, Sports Management, Informatics/Data Science, Chemistry, Operations and Information Management, Actuarial Science, Linguistics, and Mechanical Engineering. The largest number of students came from Computer Science (not a big surprise considering it is one of the data-science oriented biggest majors on campus).&lt;/p&gt;
+
+&lt;p&gt;Despite it all happening now over three months ago, I made a few notes during the presentation sessions about some simple tips that I thought could dramatically improve the group presentations, ranging from the technical to the conceptual.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Lesson 1: Make sure you use big fonts for the images in your presentation.&lt;/strong&gt; I think at least half of the presentations displayed images that even when displayed on the massively large auditorium screens in the Integrated Sciences Building, were completely illegible. I’ve documented &lt;a href=&quot;http://rpubs.com/reichnick/Rpres-font-size&quot;&gt;a simple but piecemal way&lt;/a&gt; to make the graphics better one at a time using Rpresentations (which a lot of folks were using). I’d love to have someone show me how to integrate this into a “theme”, so that it could be included only at the top of the file. But this seemed like a massive rabbit hole to fall down to understand &lt;a href=&quot;http://stackoverflow.com/questions/23619319/rpresentation-in-rstudio-make-image-fill-out-the-whole-screen&quot;&gt;how the Rpres output actually allocates real-estate&lt;/a&gt;. The whole point is to have this be simple and relatively easy.  Bottom line: make sure your graphics will look good when displayed on a large screen!&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Lesson 2: Tell a simple story.&lt;/strong&gt;  The best presentations in my opinion were the ones that focused on a simple narrative and supported it with a few key (and legible!) graphics. Overly complex answers to complex questions are hard to explain in your 3-5 minute presentation slot. I encouraged teams throughout the weekend to spend time testing out simple questions and stories. It’s always a balacing act between figuring out the simple, answerable question and wrangling with the data. But without the simple question it’s easy to get sidetracked into non-essential data cleaning tasks.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Lesson 3: Be original.&lt;/strong&gt; Because the data for the DataFests tend to be corporate (at least they have been the past few years), there is this tendency to follow the formal guidelines and think like a data scientist whose been hired by a marketing team. It’s quite possibly an interesting question to ask how the company could try to maximize profits by creating targeted marketing strategies based on say search queries or geographical location. But it’d be a valid (and creative!) approach to come at these datasets from the perspective of a data scientist consumer advocate. Could you give information to consumers that could help them make better decisions for themselves? Tips on finding good deals or seeing market inefficiencies? Yes, part of DataFest certainly incentivizes “best business insight” but it’s important to come at these problems not just as a corporate data scientist, but as a human one too.&lt;/p&gt;
+
+&lt;p&gt;I look forward to seeing the data science wizardry in upcoming iterations of DataFest. As always, hats off to the folks who made it happen this year (&lt;a href=&quot;http://math.smith.edu/~bbaumer/&quot;&gt;Ben&lt;/a&gt; and &lt;a href=&quot;http://www.science.smith.edu/~amcnamara/&quot;&gt;Amelia&lt;/a&gt; in particular).&lt;/p&gt;
+</description>
+        <pubDate>Mon, 04 Apr 2016 00:00:00 +0000</pubDate>
+        <link>http://reichlab.io//2016/04/04/datafest-lessons.html</link>
+        <guid isPermaLink="true">http://reichlab.io//2016/04/04/datafest-lessons.html</guid>
+      </item>
+    
+      <item>
+        <title>Evidence for Ebola active monitoring policies</title>
+        <description>&lt;p&gt;Sheri Fink published &lt;a href=&quot;http://www.nytimes.com/2015/12/03/health/ebola-crisis-passes-but-questions-on-quarantines-persist.html?_r=0&quot;&gt;this nice piece&lt;/a&gt; in the New York Times yesterday on the legal issues surrounding state-imposed quarantines on travelers returning from countries with widespread Ebola transmission. In addition to the toll these policies have had on the individuals who have been put under quarantine, I took away from this article that there is still a need for better data on and communication about the risks of travelers being infected with Ebola. As it happens, this is the topic of my talk today at the &lt;a href=&quot;http://www.epidemics.elsevier.com/&quot;&gt;Epidemics5 conference&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img class=&quot;img-responsive&quot; src=&quot;/images/blog/prob-of-AM-miss-both.jpg&quot; /&gt;&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;The &lt;a href=&quot;http://www.cdc.gov/vhf/ebola/exposure/monitoring-and-movement-of-persons-with-exposure.html&quot;&gt;CDC recommends active monitoring of individuals at high-, some-, and low-risk of Ebola infection&lt;/a&gt;. They encourage that state and local public health authorities to monitor individuals for symptoms of Ebola until 21 days after the individual’s last possible exposure. &lt;a href=&quot;http://www.cdc.gov/mmwr/preview/mmwrhtml/mm6425a1.htm&quot;&gt;Thousands of individuals have undergone active monitoring over the last year&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Using a few simple assumptions about the baseline risk of developing symptoms and the duration of time between exposure to Ebola and the beginning of monitoring, we have estimated the probability that an individual develops symptoms after an active monitoring period ends. Our calculations (see figure above) suggest that having a single duration or frequency of monitoring may result in quite different probabilities for individuals from different &lt;a href=&quot;http://www.cdc.gov/vhf/ebola/exposure/monitoring-and-movement-of-persons-with-exposure.html#mm-table&quot;&gt;exposure categories&lt;/a&gt;. For example, under our assumptions, monitoring an individual with a 1 in 10,000 chance of developing symptomatic illness for 5 days gives rise to between a 1 in 10,000 and 1 in 100,000 chance of developing symptoms. Similarly, monitoring a higher-risk individual who has a 1 in 500 chance of developing symptomatic illness for a longer duration of 15 days yields a roughly similar chance of developing symptoms.&lt;/p&gt;
+
+&lt;p&gt;Our hope is that this work (which is still very much in progress) offers up some simple ways of looking at these data and risks that can communicate both what we know and don’t know about a set of low-probability and high-cost scenarios in a way that is digestible to the general public and to public health decision-makers.&lt;/p&gt;
+
+&lt;p&gt;Here is the full slide deck for this talk:
+&lt;script async=&quot;&quot; class=&quot;speakerdeck-embed&quot; data-id=&quot;0c034c3cb88644eeb1cc560a505a1109&quot; data-ratio=&quot;1.33333333333333&quot; src=&quot;//speakerdeck.com/assets/embed.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;
+</description>
+        <pubDate>Thu, 03 Dec 2015 00:00:00 +0000</pubDate>
+        <link>http://reichlab.io//2015/12/03/active-monitoring-for-ebola.html</link>
+        <guid isPermaLink="true">http://reichlab.io//2015/12/03/active-monitoring-for-ebola.html</guid>
+      </item>
+    
+      <item>
+        <title>ASTMH 2015 Presentation: Real-time prediction of dengue fever in Thailand</title>
+        <description>&lt;p&gt;Last week, I had the honor of presenting at the 64th Annual Meeting of the &lt;a href=&quot;https://www.astmh.org/Home.htm&quot;&gt;American Society of Tropical Medicine &amp;amp; Hygiene (ASTMH)&lt;/a&gt; in the well-attended &lt;a href=&quot;http://www.abstractsonline.com/Plan/ViewSession.aspx?sKey=b42307ef-cc96-4877-9cfe-40cb3e3ffb51&amp;amp;mKey=%7bAB652FDF-0111-45C7-A5E5-0BA9D4AF5E12%7d&quot;&gt;Dengue: Epidemiology session&lt;/a&gt;. This presentation covers our work with the Thai Ministry of Public Health and Johns Hopkins University in building an infrastructure for making real-time dengue hemorrhagic fever case predictions and evaluating the performance of our predictions thus far.&lt;/p&gt;
+
+&lt;p&gt;You can find the slides for the presentation &lt;a href=&quot;https://speakerdeck.com/salauer/real-time-prediction-of-dengue-fever-in-thailand&quot;&gt;here&lt;/a&gt;. After the jump, I’ll provide a slide-by-slide summary. To view the paper associated with this work, you can check it out on &lt;a href=&quot;http://arxiv.org/abs/1511.04812&quot;&gt;arXiv&lt;/a&gt;.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;h4 id=&quot;slides-1-3-introduction-funding-and-project-team-members&quot;&gt;Slides 1-3: Introduction, funding, and project team members&lt;/h4&gt;
+
+&lt;h4 id=&quot;slide-4-statement-of-purpose-and-background&quot;&gt;Slide 4: Statement of purpose and background&lt;/h4&gt;
+
+&lt;p&gt;The goal of this project is to predict Thailand dengue hemorrhagic fever (DHF) outbreaks in real time. Since 1980, there have been between 17,000 and 175,000 DHF cases reported each year, with about 50,000 on average. All four dengue serotypes co-circulate in Thailand, which creates complex transmission dynamics. Furthermore, there are 77 provinces, which vary in nearly every possible dimension from geography and climate to economy and demographics. Altogether, this makes it very difficult to have one unifying model for the entire country&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-5-presentation-overview&quot;&gt;Slide 5: Presentation overview&lt;/h4&gt;
+
+&lt;h4 id=&quot;slide-6-data-pipeline&quot;&gt;Slide 6: Data pipeline&lt;/h4&gt;
+
+&lt;p&gt;Every two weeks, the Thai Ministry of Public Health (MoPH) sends us a cumulative list of all the cases reported for the year-to-date. We integrate this into our PostgreSQL database and aggregate the data into analysis datasets. We use these datasets to make predictions, which we present to the Thai MoPH as a pdf and an interactive web app.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-7-interactive-web-app&quot;&gt;Slide 7: Interactive web app&lt;/h4&gt;
+
+&lt;p&gt;With our interactive web app, the Thai MoPH can view the observed cases and our predictions for the rest of the year as a plot or on a heat map of Thailand. The app can be viewed in either English or Thai. In this screenshot, you can observe that 2013 was a large epidemic season, while 2014 was rather low. Thus far, we have already observed more cases for 2015 than for 2014, though we believe it is unlikely that there will be as many cases this year as in 2013.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-8-database&quot;&gt;Slide 8: Database&lt;/h4&gt;
+
+&lt;p&gt;The foundation of our project is our DHF database. The Thai Dengue Surveillance System has been around for nearly fifty years and has tallied DHF cases in several different sources and formats. Our team aggregated the data from these sources into a single database.&lt;/p&gt;
+
+&lt;p&gt;This graph displays over two million DHF cases over 48 years. On the y-axis are the provinces arranged by population (with Bangkok Metropolis as the most populous), the years are on the x-axis, and the colors indicate DHF incidence, with darker indicating higher rates. The ripples going across represent seasonality and multi-annual trends for each province. The dark vertical lines show the epidemics that affected multiple provinces.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-9-forecasting-model-overview&quot;&gt;Slide 9: Forecasting model overview&lt;/h4&gt;
+
+&lt;p&gt;To predict the number of DHF cases, we built a forecasting model grounded in epidemiological theory. We seek to predict the number of cases $Y$ in province $i$ at time $t$. We assume that these cases counts follow a Poisson distribution with a mean equal to $\lambda_{i,t}$ multiplied by the number of cases at the last time step.&lt;/p&gt;
+
+&lt;p&gt;By re-arranging the formula, we show that $\lambda_{i,t}$ is equivalent to the ratio of the expected current cases over the number of cases observed at the previous time step. By setting each time step to the estimated generation time of dengue, about two weeks (or what we call a biweek), $\lambda_{i,t}$ approximates the reproductive rate.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-10-gam-for-lambda_it&quot;&gt;Slide 10: GAM for $\lambda_{i,t}$&lt;/h4&gt;
+
+&lt;p&gt;We fit a generalized additive model (GAM) with three major components to estimate $\lambda_{i,t}$. $f(t)$ is a cyclic cubic spline for seasonality. $g(t)$ is a smooth spline to capture long-term secular trends. The final term takes in recently observed trends for multiple provinces at recent time points. This means that the model observes whether the number of cases are increasing or decreasing in those provinces and the magnitude of these changes. The $\alpha$ coefficients determine how these trends affect the change in cases in our province of interest at the current time step.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-11-predictions-using-complete-data&quot;&gt;Slide 11: Predictions using complete data&lt;/h4&gt;
+
+&lt;p&gt;Having formulated our model, we set out to train it by “predicting” the cases that we observed from 2000-2009. For more details about how we conducted this model training, see slide 32.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-12-14-visualizing-prediction-and-evaluation&quot;&gt;Slide 12-14: Visualizing prediction and evaluation&lt;/h4&gt;
+
+&lt;p&gt;In these slides, I will show an example of how we make predictions using complete data. The first slide shows the counts for Bangkok in 2014. On July 16th, we assume that we know all prior data and nothing of the current or future counts.&lt;/p&gt;
+
+&lt;p&gt;In the second slide, we use our forecasting model to recursively make 1,000 predictions 10 time steps into the future (for our 2000-2009 validation, we actually predicted 13 time steps forward). The points are the median prediction for each biweek surrounded by the 95% confidence interval.&lt;/p&gt;
+
+&lt;p&gt;In the third slide, we compare our predictions to the historical median for each province biweek. We define the historical median as the median case count for a given biweek in a given province over the past ten years. To evaluate our predictions, we divide the mean absolute error of our prediction by the mean absolute error of the historical median to obtain the relative mean absolute error (for more on this see slide 33).&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-15-model-training-results&quot;&gt;Slide 15: Model training results&lt;/h4&gt;
+
+&lt;p&gt;The table on this slide displays how often our model made better predictions than a model that merely predicted the historical median. For more detailed results from our model training, see slide 34.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-16-predictions-using-real-time-data&quot;&gt;Slide 16: Predictions using real-time data&lt;/h4&gt;
+
+&lt;p&gt;Having trained our model, we set out to use it to predict the 2014 season in real time. However, when the Thai MoPH started sending us case reports at the end of 2013, we immediately noticed something was different…&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-17-reporting-delays&quot;&gt;Slide 17: Reporting delays&lt;/h4&gt;
+
+&lt;p&gt;… There were reporting delays. We define a reporting delay as the time difference between the onset of symptoms for a case and when that case enters our database. We realized that we would need to adjust our forecasting model in order to account for these reporting delays and would be unable to predict the 2014 season in real time.&lt;/p&gt;
+
+&lt;p&gt;In April of 2015, we received our final case report for 2014. In 2014, reporting delays ranged from 1 day to 17 months; 75% of cases were reported within 3 months and 95% were reported within 8 months.&lt;/p&gt;
+
+&lt;h4 id=&quot;slides-18-22-real-time-prediction-adjustment&quot;&gt;Slides 18-22: Real-time prediction adjustment&lt;/h4&gt;
+
+&lt;p&gt;Using our previous example, I will display how we adjusted our forecasts to be conducted in real time. The first slide of this sequence shows the assumptions of our model from before, with complete reporting.&lt;/p&gt;
+
+&lt;p&gt;The second slide shows what we had actually observed at that point in time. Instead of seeing all of the data before July 16th, there are no cases reported for the previous biweek and steadily more further back in time. This is an exceptional scenario before a large data dump with many of the cases from January through May were reported, however it is indicative of the challenges we face when trying to predict in real time.&lt;/p&gt;
+
+&lt;p&gt;In the third slide, we move our prediction date back 6 biweeks. Even though only 75% of cases have been reported by this time (on average), we assume that all cases prior to this date are complete and ignore everything since. While this is a rather weak assumption in this specific case, we use it as a starting point for making real-time forecasts.&lt;/p&gt;
+
+&lt;p&gt;The fourth and fifth slides show our predictions and comparison to historical medians as in slides 13-14.&lt;/p&gt;
+
+&lt;h4 id=&quot;slides-23-25-predicting-2014&quot;&gt;Slides 23-25: “Predicting” 2014&lt;/h4&gt;
+
+&lt;p&gt;By keeping the reporting dates for each case, we were able to use our model to “predict” the 2014 season as if in real time. After making the predictions, we ranked the provinces by their performance relative to historical medians.&lt;/p&gt;
+
+&lt;p&gt;The first slide shows two multi-step predictions from the three provinces that performed best compared to the historical medians. The second slide shows the three provinces that performed adequately against the historical medians. The third slide shows the three provinces that performed worst against the historical medians. Note that a couple of these predictions “explode” and become very large at a fast rate. Whether this is due to issues in reporting or for model-based reasons has yet to be determined.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-26-real-time-results&quot;&gt;Slide 26: “Real-time” results&lt;/h4&gt;
+
+&lt;p&gt;One time step forecasts for our “real-time” model performed comparably to four month ahead predictions in the complete data training model. Two month ahead real-time predictions are outperformed by the historical medians model.&lt;/p&gt;
+
+&lt;p&gt;2014 was a rather anomalous season. After the large epidemic season in 2013, many provinces observed more cases in January and February than during the rainy season, from May to October, when the majority of cases usually occur. Furthermore, our model was trained on ten seasons with nearly 20,000 predicted province biweeks. By contrast, we made fewer than 2,000 predictions for the 2014 season. We expect these numbers to change as our model makes more forecasts. For more detailed results from our model training, see slide 35.&lt;/p&gt;
+
+&lt;p&gt;Therefore, we continued on to predict the 2015 dengue season in real time with the same model.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-27-2015-predictions-to-date&quot;&gt;Slide 27: 2015 predictions to date&lt;/h4&gt;
+
+&lt;p&gt;This graph shows the observed case counts of 2015 as of October 22nd as black bars and our predictions for each time point as green lines. From our experience with reporting delays, we know that all of the cases will increase between now and April 2016. Thus far, 2015 has been a more regular dengue season than 2014. In October, we started to receive a large number of reported cases for Bangkok in July and August. While our model generally predicts that 2015 will have fewer cases than 2013, the large uncertainty about Bangkok allows a slim possibility for 2015 to surpass that season.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-28-central-achievements&quot;&gt;Slide 28: Central achievements&lt;/h4&gt;
+
+&lt;h4 id=&quot;slide-29-future-developments&quot;&gt;Slide 29: Future developments&lt;/h4&gt;
+
+&lt;p&gt;There are several augmentations we hope to incorporate into our model before the Thais begin using our model to make public health policy decisions in 2016. We are modeling the reporting delays so that we can use all of the information we have at our disposal instead of ignoring recent data.&lt;/p&gt;
+
+&lt;p&gt;Serotype dynamics play a major role in the transmission of dengue. While the true structure is incredibly complex, we are hoping to use some simplified approximations to improve our model.&lt;/p&gt;
+
+&lt;p&gt;The use of climate information may help us determine the timing of the dengue season.&lt;/p&gt;
+
+&lt;p&gt;When making biweek-scale forecasts, some intuition we have about multi-annual dengue trends may get lost. By incorporating annual predictions, we may be able to adjust our forecasts to make better long-term predictions.&lt;/p&gt;
+
+&lt;p&gt;Eventually, our ultimate goal is to wrap several strong models into a single ensemble model capable of making more accurate forecasts for dengue hemorrhagic fever in Thailand.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-30-final-slide&quot;&gt;Slide 30: Final slide&lt;/h4&gt;
+
+&lt;p&gt;Forgot to mention that my twitter handle is @salauer_biostat&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-31-database-sources&quot;&gt;Slide 31: Database sources&lt;/h4&gt;
+
+&lt;p&gt;The two major contributors to our database were monthly aggregated counts for the years before 2005 and a line list of individual cases since 1999.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-32-model-training&quot;&gt;Slide 32: Model training&lt;/h4&gt;
+
+&lt;p&gt;To conduct model training, we used leave-one-year-out cross validation (i.e. use all the data from 1968-1999 and 2001-2009 to predict 2000, then use all data from 1968-2000 and 2002-2009 to predict 2001, etc.). We used many combinations of lags and correlated provinces. The combination that performed best at making forecasts by relative mean absolute error (more info on slide 33) was one with 3 correlated provinces at the prior time step. That was on average for the whole country, there was provincial variation for best combination.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-33-relative-mean-absolute-error-mae&quot;&gt;Slide 33: Relative mean absolute error (MAE)&lt;/h4&gt;
+
+&lt;p&gt;Relative MAE is intuitive because when it represents the amount of error of one system over another. A relative MAE of 0.5 means that our model has half of the error of the historical medians model; a relative MAE of 1 indicates that the models are equivalent; and a relative MAE of 2 conveys that our model has twice as much error as the historical medians model.&lt;/p&gt;
+
+&lt;p&gt;One advantage of using MAE is that it doesn’t penalize outliers as much as other evaluation measures, such as mean squared error.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-34-training-relative-mae-results&quot;&gt;Slide 34: Training relative MAE results&lt;/h4&gt;
+
+&lt;p&gt;This graph shows the performance of each province from the model training. On the y-axis are the provinces ordered by population; the x-axis has the relative MAE; and the color of the points represent different forecast horizons, with lighter colors indicating longer term predictions.&lt;/p&gt;
+
+&lt;p&gt;For these results, the vast majority of the points are to the left of the dashed line, which indicates that the predictions had less error than those of the historical medians model. Also, darker points tend to be to the left of lighter points, which indicates that our short-term forecasts are better than our long-term forecasts, relative to the historical medians model.&lt;/p&gt;
+
+&lt;h4 id=&quot;slide-35-real-time-relative-mae-results&quot;&gt;Slide 35: “Real-time” relative MAE results&lt;/h4&gt;
+
+&lt;p&gt;This graph is set up in the same way as the one for training in slide 34, except that the step numbers are adjusted for our 6 biweek adjustment.&lt;/p&gt;
+
+&lt;p&gt;There is much more variation in these results (note the log scale on the x-axis) than for the training results. This is partially due to the fact that the results are averaged over one season instead of ten seasons. There are also some provinces which had better long-term predictions than short-term predictions. This may be due to the anomalous timing of the 2014 dengue season, reporting delays, or other factors.&lt;/p&gt;
+</description>
+        <pubDate>Tue, 17 Nov 2015 00:00:00 +0000</pubDate>
+        <link>http://reichlab.io//2015/11/17/lauer-astmh-presentation.html</link>
+        <guid isPermaLink="true">http://reichlab.io//2015/11/17/lauer-astmh-presentation.html</guid>
+      </item>
+    
+      <item>
+        <title>Strange bedfellows: methods for predicting the NBA and flu</title>
+        <description>&lt;p&gt;FiveThirtyEight’s new &lt;a href=&quot;http://fivethirtyeight.com/features/how-were-predicting-nba-player-career/&quot;&gt;CARMELO prediction alorithm, that projects the future careers of every NBA player&lt;/a&gt;, has similarity with prediction methods in other fields.&lt;/p&gt;
+
+&lt;!--more--&gt;
+
+&lt;p&gt;I read up this morning on &lt;a href=&quot;http://fivethirtyeight.com/features/how-were-predicting-nba-player-career/&quot;&gt;CARMELO&lt;/a&gt;, the latest stats-backed tool to come out of Nate Silver’s shop at FiveThirtyEight. They clearly have down the formla for putting together real quantitative predictions with a glossy front end delivery. &lt;a href=&quot;http://projects.fivethirtyeight.com/carmelo/&quot;&gt;It looks slick!&lt;/a&gt; As they point out, CARMELO is based on &lt;a href=&quot;https://en.wikipedia.org/wiki/PECOTA&quot;&gt;PECOTA, a similar system for predicting baseball player careers&lt;/a&gt;, which was Nate’s first big modeling breakthrough back in the early-mid 2000s.&lt;/p&gt;
+
+&lt;p&gt;What struck me reading through this today was how similar it is to what is known as “the method of analogues” in at least the &lt;a href=&quot;http://ww2010.atmos.uiuc.edu/(Gh)/guides/mtr/fcst/mth/oth.rxml&quot;&gt;meterological&lt;/a&gt; and &lt;a href=&quot;http://www.ncbi.nlm.nih.gov/pubmed/14607808&quot;&gt;infectious disease&lt;/a&gt; forecasting communities. The shared idea in these prediction methods is that you find “similar” observations to the one that you are trying to predict in your existing dataset. Then, look at those similar observations, see what they did in the future and use them to come up with some intelligent guess about what your observation of interest will do. (Hint: it tends to be something like a weighted mean of the observed trajectories of the similar datapoints.)&lt;/p&gt;
+
+&lt;p&gt;Evan Ray and Krzysztof Sakrejda, post-docs in the &lt;a href=&quot;http://reichlab.github.io&quot;&gt;Reich Lab&lt;/a&gt;, put together a new formulation of the method of analogues for a submission to the &lt;a href=&quot;http://predict.phiresearchlab.org/dengue/index.html&quot;&gt;White House Dengue Prediction Challenge&lt;/a&gt; this past summer, for predicting outbreaks of dengue fever in Puerto Rico and Peru. Their submission method wasn’t in the top three performers, but it wasn’t too shabby either, and there were a few small tweaks and fixes that they are working on to see if that might improve performance. (The complete story will be the topic of a future blog post.) Their method (still a work in progress) including code, as well as brief and detailed write-ups can be found on &lt;a href=&quot;https://github.com/reichlab/dengue-ssr-prediction/&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;I find it interesting to see the similarities of some of these methods from disparate fields. Please comment if you know or recognize these prediction methods from yet other contexts.&lt;/p&gt;
+
+&lt;p&gt;I’ll be curious to see (and hope the folks at FiveThirtyEight put together, in 8 months) some honest evaluations of these early drafts of CARMELO. At the end of this season, for example, what will the actual CARMELO prediction interval coverages be? How much more/less accurate will the  point predictions for a player’s WAR be comparing CARMELO to a simple model? (Possible simple model: a player’s WAR from last year or the average WAR of players with a given number of years’ experience.) These questions get at a common theme of a lot of our research lately: how can you tell that a prediction is adding value? Turns out, this is a tougher question to answer than it appears.&lt;/p&gt;
+</description>
+        <pubDate>Mon, 12 Oct 2015 00:00:00 +0000</pubDate>
+        <link>http://reichlab.io//2015/10/12/predicting-basketball-and-flu.html</link>
+        <guid isPermaLink="true">http://reichlab.io//2015/10/12/predicting-basketball-and-flu.html</guid>
+      </item>
+    
+  </channel>
+</rss>
